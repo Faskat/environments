@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>Environments</AssemblyName>
+    <RootNamespace>Environments</RootNamespace>
+    <Version>0.1.0</Version>
+    <Product>Environments</Product>
+    <Description>Presets that close everything you don't need and launch what you do.</Description>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\tray-dark.ico" />
+    <Resource Include="Assets\tray-light.ico" />
+  </ItemGroup>
+
+</Project>
