@@ -28,8 +28,11 @@ Environments.exe --dry-run "Игра"
 Environments.exe --apply "Игра" [--limit notepad,mspaint]
 Environments.exe --undo
 Environments.exe --hidden        # start in the tray (used by autostart)
+Environments.exe --preview game  # open the preview window for a preset right away
 ```
 `--limit` restricts closing and launching to the named processes, which is handy for testing.
+
+Demo mode for recordings: `ENVIRONMENTS_DEMO_CLOSE=mspaint,charmap` lets presets close only those processes, from the GUI, hotkeys and CLI alike.
 
 Settings live in `%APPDATA%\Environments\config.json` (override with `ENVIRONMENTS_DATA`).
 Design brief: [DESIGN.md](DESIGN.md).

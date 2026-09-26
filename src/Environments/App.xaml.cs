@@ -70,7 +70,13 @@ public partial class App : Application
         if (FailedHotkeys.Count > 0)
             _tray.Notify("Горячие клавиши заняты", string.Join(", ", FailedHotkeys) + " — выбери другие в пресетах.");
 
-        if (!e.Args.Contains("--hidden")) ShowMain();
+        // --preview "Игра" opens the preview window straight away (handy for scripts and demos).
+        int pv = Array.FindIndex(e.Args, a => a.Equals("--preview", StringComparison.OrdinalIgnoreCase));
+        var previewPreset = pv >= 0 && pv + 1 < e.Args.Length
+            ? Config.Presets.FirstOrDefault(p => p.Name.Equals(e.Args[pv + 1], StringComparison.OrdinalIgnoreCase) || p.Id == e.Args[pv + 1])
+            : null;
+        if (previewPreset != null) RunPreset(previewPreset, true);
+        else if (!e.Args.Contains("--hidden")) ShowMain();
     }
 
     /// <summary>Configs written before the icon set used emoji; swap them for icon names once.</summary>

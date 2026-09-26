@@ -38,6 +38,15 @@ public class Plan
 
 public static class Planner
 {
+    /// <summary>
+    /// Demo mode for screen recordings: when ENVIRONMENTS_DEMO_CLOSE lists process names, only those can ever be
+    /// closed, from the GUI, hotkeys and CLI alike. Everything else counts as kept; launching is unaffected.
+    /// </summary>
+    public static readonly ISet<string>? DemoClose =
+        Environment.GetEnvironmentVariable("ENVIRONMENTS_DEMO_CLOSE") is { Length: > 0 } v
+            ? v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet(StringComparer.OrdinalIgnoreCase)
+            : null;
+
     /// <param name="limit">Test hook: only processes with these names are considered (for closing and launching).</param>
     public static Plan Build(Config cfg, Preset preset, SystemSnapshot? snap = null, ISet<string>? limit = null)
     {
@@ -82,6 +91,7 @@ public static class Planner
         }
 
         bool InLimit(string name) => limit == null || limit.Contains(name);
+        bool MayClose(string name) => DemoClose == null || DemoClose.Contains(name);
 
         var children = snap.Procs.Values.ToLookup(p => p.ParentPid);
         bool HasKeptDescendant(int pid)
@@ -103,7 +113,7 @@ public static class Planner
         foreach (var app in snap.Apps)
         {
             if (!InLimit(app.Name)) continue;
-            if (IsKept(app.Pid)) { plan.Kept.Add(app); continue; }
+            if (IsKept(app.Pid) || !MayClose(app.Name)) { plan.Kept.Add(app); continue; }
             var def = cfg.AppFor(app);
             int root = RootOfSameApp(app.Pid, def);
             plan.ToClose.Add(new Candidate { App = app, Def = def, KillPid = root, TreeKillSafe = !HasKeptDescendant(root) });
@@ -114,7 +124,7 @@ public static class Planner
             var windowed = snap.Apps.Select(a => a.Pid).ToHashSet();
             var windowsDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
             var bg = snap.Procs.Values
-                .Where(p => !windowed.Contains(p.Pid) && p.Pid > 4 && InLimit(p.Name)
+                .Where(p => !windowed.Contains(p.Pid) && p.Pid > 4 && InLimit(p.Name) && MayClose(p.Name)
                             && WindowScanner.IsSameSession(p.Pid)
                             && p.Path != null && !p.Path.StartsWith(windowsDir, StringComparison.OrdinalIgnoreCase)
                             && !IsKept(p.Pid))
