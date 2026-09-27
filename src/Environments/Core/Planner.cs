@@ -18,8 +18,12 @@ public class Candidate : Observable
     /// <summary>Process to kill if closing fails; the top of the app's own process chain.</summary>
     public int KillPid { get; init; }
 
+    /// <summary>Matches the protected list: no preset ever closes it, but it can still be added to groups and launch lists.</summary>
+    public bool IsProtected { get; init; }
+
     public string DisplayName => Def?.Name ?? App.Name;
-    public string Subtitle => App.HasWindow ? App.MainTitle : "фоновый процесс";
+    public string Subtitle => IsProtected ? "защищено, пресеты не закрывают"
+        : App.HasWindow ? App.MainTitle : "фоновый процесс";
 }
 
 public class LaunchItem
