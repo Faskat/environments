@@ -133,7 +133,7 @@ public static class Defaults
             new string[0], new string[0]),
     };
 
-    /// <summary>Never closed by any preset: shell, system, drivers, overlays, terminals and Claude.</summary>
+    /// <summary>Never closed by any preset: shell, system, drivers, overlays and terminals.</summary>
     public static List<AppRule> Protected() => new[]
     {
         "explorer", "dwm", "csrss", "winlogon", "sihost", "fontdrvhost", "ctfmon", "svchost", "RuntimeBroker",
@@ -141,6 +141,6 @@ public static class Defaults
         "SystemSettings", "Taskmgr", "ShellHost", "Widgets", "WidgetService", "SecurityHealthSystray", "SecHealthUI",
         "MsMpEng", "NVIDIA*", "nvcontainer", "nvsphelper64", "RtkAudUService64", "Razer*", "SteelSeries*",
         "PowerToys*", "msedgewebview2", "WindowsTerminal", "OpenConsole", "conhost", "cmd", "powershell", "pwsh",
-        "claude", "Environments", "RTSS", "MSIAfterburner",
+        "Environments", "RTSS", "MSIAfterburner",
     }.Select(AppRule.Proc).ToList();
 }
