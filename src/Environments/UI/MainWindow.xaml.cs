@@ -105,6 +105,8 @@ public partial class MainWindow : Window
 
         ReloadAll();
         Closing += (_, _) => { if (_saveTimer.IsEnabled) { _saveTimer.Stop(); App.Instance.SaveConfig(); } };
+        // Minimizing sends the window to the tray instead of the taskbar; the tray icon brings it back.
+        StateChanged += (_, _) => { if (WindowState == WindowState.Minimized) Hide(); };
     }
 
     void ReloadAll()
