@@ -35,9 +35,12 @@ public class LaunchItem
 public class Plan
 {
     public Preset Preset { get; init; } = null!;
+    public Config Config { get; init; } = null!;
     public List<Candidate> ToClose { get; init; } = new();
     public List<RunningApp> Kept { get; init; } = new();
     public List<LaunchItem> ToLaunch { get; init; } = new();
+    /// <summary>The test hook passed to Build, needed later by the window layout step.</summary>
+    public ISet<string>? Limit { get; init; }
 }
 
 public static class Planner
@@ -112,7 +115,7 @@ public static class Planner
             return false;
         }
 
-        var plan = new Plan { Preset = preset };
+        var plan = new Plan { Preset = preset, Config = cfg, Limit = limit };
 
         foreach (var app in snap.Apps)
         {

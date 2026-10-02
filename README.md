@@ -6,6 +6,7 @@ Presets for Windows that close everything you don't need and launch what you do.
 ## Features
 - Built-in presets: Игра, Стрим / запись, Учёба / НМТ, Код, 3D / Blender, Чилл, Чистый лист (Ctrl+Alt+1…6, 0).
 - Per preset: what to keep (apps or groups), what to launch if not running, close mode, hotkey, colour.
+- Window layout: remember where the preset's apps sit right now (which monitor, half of the screen, maximized, minimized) and after every preset run each app's window returns to its spot — launched or already running.
 - Close modes: gentle (WM_CLOSE only), smart (also kill apps that hid to the tray, never touch windows asking to save), force.
 - "New desktop" presets: create a separate virtual desktop, switch to it and launch the preset's apps there, closing nothing.
 - Preview before applying, "undo" relaunches whatever the last preset closed.
@@ -26,6 +27,7 @@ Design assets (icons, tokens) live in `design/`. After changing an SVG there, ru
 Environments.exe --list
 Environments.exe --dry-run "Игра"
 Environments.exe --apply "Игра" [--limit notepad,mspaint]
+Environments.exe --save-layout "Игра"   # remember the current window arrangement into the preset
 Environments.exe --undo
 Environments.exe --hidden        # start in the tray (used by autostart)
 Environments.exe --preview game  # open the preview window for a preset right away

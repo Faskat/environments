@@ -129,6 +129,37 @@ public enum CloseMode
     Force
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum PlacementState
+{
+    /// <summary>Window sits where the rect says: half of the screen, a corner, a second monitor…</summary>
+    Normal,
+    /// <summary>Window was maximized on that monitor.</summary>
+    Maximized,
+    /// <summary>Window was minimized, but remembers where it restores to.</summary>
+    Minimized
+}
+
+/// <summary>Saved spot of one app's window: which monitor, where on it and how the window was shown.</summary>
+public class WindowPlacement
+{
+    public string AppId { get; set; } = "";
+
+    /// <summary>Monitor index at capture time; MonitorDevice is the primary key, this is the fallback.</summary>
+    public int Monitor { get; set; }
+
+    /// <summary>Monitor device name ("\\.\DISPLAY2"), so the spot survives monitors being replugged.</summary>
+    public string MonitorDevice { get; set; } = "";
+
+    /// <summary>Window rect relative to the monitor's top-left corner, so it works after resolution changes.</summary>
+    public int Left { get; set; }
+    public int Top { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
+
+    public PlacementState State { get; set; } = PlacementState.Normal;
+}
+
 public class Preset : Observable
 {
     private string _name = "";
@@ -140,6 +171,8 @@ public class Preset : Observable
     private bool _minimize;
     private bool _includeBackground;
     private bool _newDesktop;
+    private bool _applyLayout;
+    private List<WindowPlacement> _layout = new();
 
     public string Id { get; set; } = "";
     public string Name { get => _name; set => Set(ref _name, value); }
@@ -160,6 +193,12 @@ public class Preset : Observable
 
     /// <summary>Create a new virtual desktop, switch to it and launch there instead of closing anything.</summary>
     public bool NewDesktop { get => _newDesktop; set => Set(ref _newDesktop, value); }
+
+    /// <summary>After closing and launching, put every app's window back to its saved spot.</summary>
+    public bool ApplyLayout { get => _applyLayout; set => Set(ref _applyLayout, value); }
+
+    /// <summary>Spots captured with "запомнить расположение окон", one per app.</summary>
+    public List<WindowPlacement> Layout { get => _layout; set => Set(ref _layout, value); }
 }
 
 public class Settings

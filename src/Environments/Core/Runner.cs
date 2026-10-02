@@ -16,6 +16,8 @@ public class Report
     public List<string> Launched { get; } = new();
     public List<string> AlreadyRunning { get; } = new();
     public List<string> LaunchFailed { get; } = new();
+    public List<string> Placed { get; } = new();
+    public List<string> NotPlaced { get; } = new();
     public bool NewDesktop { get; set; }
 
     public string Summary()
@@ -29,6 +31,8 @@ public class Report
         if (Failed.Count > 0) parts.Add($"ошибки: {string.Join(", ", Failed)}");
         if (Launched.Count > 0) parts.Add($"запущено: {string.Join(", ", Launched)}");
         if (LaunchFailed.Count > 0) parts.Add($"не запустилось: {string.Join(", ", LaunchFailed)}");
+        if (Placed.Count > 0) parts.Add($"окна расставлены: {string.Join(", ", Placed)}");
+        if (NotPlaced.Count > 0) parts.Add($"не дождался окна: {string.Join(", ", NotPlaced)}");
         if (NewDesktop && AlreadyRunning.Count > 0) parts.Add($"на старом столе: {string.Join(", ", AlreadyRunning)}");
         return parts.Count == 0 ? "Всё уже как надо" : char.ToUpper(parts[0][0]) + string.Join(", ", parts)[1..];
     }
@@ -46,6 +50,8 @@ public class Report
         Add("Запущено", Launched);
         Add(NewDesktop ? "Уже запущено (осталось на старом столе)" : "Уже было запущено", AlreadyRunning);
         Add("Не запустилось", LaunchFailed);
+        Add("Окна расставлены", Placed);
+        Add("Не дождался окна", NotPlaced);
         return lines.Count == 0 ? "Всё уже как надо" : string.Join(Environment.NewLine, lines);
     }
 }
@@ -117,14 +123,22 @@ public static class Runner
             }
         }
 
+        var launchedIds = new HashSet<string>();
         foreach (var item in plan.ToLaunch)
         {
             if (item.AlreadyRunning) { report.AlreadyRunning.Add(item.App.Name); continue; }
             progress?.Report($"Запускаю {item.App.Name}…");
             var err = Launcher.Start(item.App);
-            if (err == null) report.Launched.Add(item.App.Name);
+            if (err == null) { report.Launched.Add(item.App.Name); launchedIds.Add(item.App.Id); }
             else report.LaunchFailed.Add($"{item.App.Name} ({err})");
             await Task.Delay(400);
+        }
+
+        if (preset.ApplyLayout && preset.Layout.Count > 0)
+        {
+            var (placed, missed) = await LayoutManager.ApplyAsync(plan.Config, preset, launchedIds, plan.Limit, progress);
+            report.Placed.AddRange(placed);
+            report.NotPlaced.AddRange(missed);
         }
 
         return report;

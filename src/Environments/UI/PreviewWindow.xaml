@@ -55,6 +55,9 @@
 
                 <TextBlock x:Name="LaunchTitle" Style="{StaticResource H2}" Text="Запустится" />
                 <TextBlock x:Name="LaunchText" Style="{StaticResource Hint}" />
+
+                <TextBlock x:Name="LayoutTitle" Style="{StaticResource H2}" Text="Встанут на свои места" />
+                <TextBlock x:Name="LayoutText" Style="{StaticResource Hint}" />
             </StackPanel>
         </ScrollViewer>
 

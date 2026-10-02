@@ -305,6 +305,24 @@
                                       Content="Сворачивать вместо закрытия" />
                             <CheckBox x:Name="BackgroundBox" Margin="0,12,0,0" Checked="PresetCheck_Changed" Unchecked="PresetCheck_Changed"
                                       Content="Закрывать и фоновые программы (без окна, в трее)" />
+
+                            <TextBlock Style="{StaticResource H2}" Margin="0,24,0,0" Text="Где стоят окна" />
+                            <CheckBox x:Name="ApplyLayoutBox" Margin="0,8,0,0" Checked="PresetCheck_Changed" Unchecked="PresetCheck_Changed">
+                                <StackPanel>
+                                    <TextBlock Text="Расставлять окна по запомненным местам" />
+                                    <TextBlock Style="{StaticResource Hint}"
+                                               Text="После пресета каждое приложение встанет туда, где стояло при запоминании: половина экрана, на весь экран, нужный монитор." />
+                                </StackPanel>
+                            </CheckBox>
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <Button x:Name="CaptureLayoutButton" Click="CaptureLayout_Click" ToolTip="Расставь окна как надо и нажми сюда">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:Glyph Icon="focus" Margin="0,0,8,0" />
+                                        <TextBlock Text="Запомнить расположение окон" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            <TextBlock x:Name="LayoutSummary" Style="{StaticResource Hint}" Margin="0,8,0,0" />
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>

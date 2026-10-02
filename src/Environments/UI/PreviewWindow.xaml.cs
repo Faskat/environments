@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -49,6 +50,12 @@ public partial class PreviewWindow : Window
         var launch = _plan.ToLaunch.Select(i => i.AlreadyRunning ? $"{i.App.Name} (уже запущено)" : i.App.Name).ToList();
         LaunchTitle.Visibility = LaunchText.Visibility = launch.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         LaunchText.Text = string.Join(" · ", launch);
+
+        var layout = _preset.ApplyLayout
+            ? _preset.Layout.Select(e => App.Config.FindApp(e.AppId)?.Name).OfType<string>().Distinct().ToList()
+            : new List<string>();
+        LayoutTitle.Visibility = LayoutText.Visibility = layout.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        LayoutText.Text = string.Join(" · ", layout);
 
         SubHeader.Text = ModeText();
         ApplyButton.IsEnabled = true;

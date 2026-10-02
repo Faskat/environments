@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Threading.Tasks;
 using Environments.Core;
 using Microsoft.Win32;
 
@@ -164,6 +165,8 @@ public partial class MainWindow : Window
         MinimizeBox.IsChecked = p.Minimize;
         UpdateCloseOptions();
         BackgroundBox.IsChecked = p.IncludeBackground;
+        ApplyLayoutBox.IsChecked = p.ApplyLayout;
+        UpdateLayoutSummary();
         ModeGentle.IsChecked = p.Mode == CloseMode.Gentle;
         ModeSmart.IsChecked = p.Mode == CloseMode.Smart;
         ModeForce.IsChecked = p.Mode == CloseMode.Force;
@@ -272,8 +275,36 @@ public partial class MainWindow : Window
         _preset.Minimize = MinimizeBox.IsChecked == true;
         _preset.IncludeBackground = BackgroundBox.IsChecked == true;
         _preset.NewDesktop = NewDesktopBox.IsChecked == true;
+        _preset.ApplyLayout = ApplyLayoutBox.IsChecked == true;
         UpdateCloseOptions();
         ScheduleSave();
+    }
+
+    void UpdateLayoutSummary()
+    {
+        if (_preset == null) return;
+        var names = _preset.Layout.Select(e => Cfg.FindApp(e.AppId)?.Name ?? e.AppId).ToList();
+        LayoutSummary.Text = names.Count == 0
+            ? "Пока ничего не запомнено: расставь окна как надо (можно на весь экран или пол-экрана) и нажми кнопку."
+            : $"Запомнено: {string.Join(", ", names)}.";
+    }
+
+    async void CaptureLayout_Click(object sender, RoutedEventArgs e)
+    {
+        if (_preset == null) return;
+        CaptureLayoutButton.IsEnabled = false;
+        try
+        {
+            var spots = await Task.Run(() => LayoutManager.Capture(Cfg, _preset));
+            _preset.Layout = spots;
+            App.Instance.SaveConfig();
+            UpdateLayoutSummary();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, "Не получилось запомнить: " + ex.Message, "Environments");
+        }
+        finally { CaptureLayoutButton.IsEnabled = true; }
     }
 
     /// <summary>A preset on a new desktop closes nothing, so the closing options do not apply.</summary>

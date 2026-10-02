@@ -12,11 +12,12 @@ namespace Environments;
 ///   --list
 ///   --dry-run "Игра" [--limit notepad,mspaint]
 ///   --apply "Игра"   [--limit notepad,mspaint]
+///   --save-layout "Игра"
 ///   --undo
 /// </summary>
 public static class Cli
 {
-    static readonly string[] Commands = { "--list", "--dry-run", "--apply", "--undo" };
+    static readonly string[] Commands = { "--list", "--dry-run", "--apply", "--undo", "--save-layout" };
 
     public static bool IsCli(string[] args) => args.Any(a => Commands.Contains(a, StringComparer.OrdinalIgnoreCase));
 
@@ -46,6 +47,22 @@ public static class Cli
         {
             var r = Task.Run(() => Runner.Undo(cfg)).GetAwaiter().GetResult();
             Console.WriteLine(r.Details());
+            return 0;
+        }
+
+        if (Arg("--save-layout") is { } saveName)
+        {
+            var sp = cfg.Presets.FirstOrDefault(p => p.Name.Equals(saveName, StringComparison.OrdinalIgnoreCase)
+                                                     || p.Id.Equals(saveName, StringComparison.OrdinalIgnoreCase));
+            if (sp == null)
+            {
+                Console.WriteLine($"Нет пресета «{saveName}». Есть: {string.Join(", ", cfg.Presets.Select(p => p.Name))}");
+                return 2;
+            }
+            sp.Layout = Task.Run(() => LayoutManager.Capture(cfg, sp)).GetAwaiter().GetResult();
+            sp.ApplyLayout = true;
+            Storage.Save(cfg);
+            Console.WriteLine($"Запомнил расположение {sp.Layout.Count} окон для «{sp.Name}».");
             return 0;
         }
 
