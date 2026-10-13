@@ -3,6 +3,12 @@
 Presets for Windows that close everything you don't need and launch what you do.
 "Game" keeps Discord, Telegram, Steam and the game, closes the rest and starts Discord if it isn't running.
 
+Status: active development, version 0.1.0. Platform: Windows desktop (WPF).
+The application targets .NET 9; a framework-dependent build needs the .NET 9
+Desktop Runtime. The isolated test harness uses the .NET 10 SDK.
+
+![Application taskbar screenshot](design/taskbar-check.png)
+
 ## Features
 - Built-in presets: Игра, Стрим / запись, Учёба / НМТ, Код, 3D / Blender, Чилл, Чистый лист (Ctrl+Alt+1…6, 0).
 - Per preset: what to keep (apps or groups), what to launch if not running, close mode, hotkey, colour.
@@ -14,13 +20,27 @@ Presets for Windows that close everything you don't need and launch what you do.
 - Tray menu, global hotkeys, autostart, preset import/export.
 
 ## Build
-Requires the .NET 9 SDK.
+Requires the .NET 9 SDK or newer. CI builds with the .NET 10 SDK.
 
 ```
 dotnet publish src/Environments -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o dist
 ```
 
 Design assets (icons, tokens) live in `design/`. After changing an SVG there, run `node scripts/gen-icons.mjs` to regenerate `UI/IconData.cs`.
+
+## Checks
+
+```powershell
+dotnet build src/Environments/Environments.csproj -c Release
+dotnet run --project tests/Environments.Core.Tests -c Release
+```
+
+The test harness links the production matching, planner and snapshot code. It
+supplies synthetic process trees and replaces native calls with a test boundary,
+covering protected apps, kept descendants, helper processes, launch detection,
+new desktops and cyclic ancestry. It never closes or launches real processes.
+CI runs these checks on Windows for pushes and pull requests; interactive WPF,
+hotkeys and real window placement still require a manual Windows session.
 
 ## Command line
 ```

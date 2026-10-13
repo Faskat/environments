@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build Windows application
+        run: dotnet build src/Environments/Environments.csproj --configuration Release
+      - name: Verify planner using synthetic processes only
+        run: dotnet run --project tests/Environments.Core.Tests --configuration Release
